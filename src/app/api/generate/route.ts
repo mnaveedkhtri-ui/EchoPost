@@ -55,20 +55,20 @@ export async function POST(req: Request) {
     }
 
     // 2. Generate LinkedIn Post & Slides using Groq LLaMA
-    const prompt = `You are an expert B2B LinkedIn ghostwriter for SaaS founders and agency owners. 
-    Turn the following raw voice transcript into a viral LinkedIn post and a 5-slide PDF carousel.
+    const prompt = `You are an expert B2B LinkedIn ghostwriter. Turn the following raw voice transcript into a viral LinkedIn post and a 5-slide PDF carousel.
     
     Transcript: "${transcript}"
     
-    Respond ONLY with a valid JSON object matching this schema:
+    You MUST respond with ONLY a valid JSON object. Do not include markdown formatting or backticks around the JSON.
+    Schema:
     {
-      "post": "The full text for the LinkedIn caption, formatted beautifully with line breaks. No hashtags.",
+      "post": "The full text for the LinkedIn caption, formatted beautifully with line breaks.",
       "slides": [
-        { "title": "Slide 1 Hook", "content": "Bold statement or question" },
-        { "title": "Slide 2 Context", "content": "Why does this matter?" },
-        { "title": "Slide 3 Insight", "content": "The core lesson" },
+        { "title": "Slide 1 Hook", "content": "Bold statement" },
+        { "title": "Slide 2 Context", "content": "Why it matters" },
+        { "title": "Slide 3 Insight", "content": "Core lesson" },
         { "title": "Slide 4 Example", "content": "Actionable takeaway" },
-        { "title": "Slide 5 CTA", "content": "Call to action for the comments" }
+        { "title": "Slide 5 CTA", "content": "Call to action" }
       ]
     }`;
 
@@ -80,20 +80,26 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         model: 'llama-3.1-70b-versatile',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        response_format: { type: "json_object" }
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that outputs ONLY pure JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7
       })
     });
 
     if (!chatRes.ok) {
       const err = await chatRes.text();
       console.error('LLaMA Error:', err);
-      return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
+      return NextResponse.json({ error: `Failed to generate content: ${err}` }, { status: 500 });
     }
 
     const chatData = await chatRes.json();
-    const resultContent = chatData.choices[0].message.content;
+    let resultContent = chatData.choices[0].message.content;
+    
+    // Clean up any potential markdown wrapper from the AI
+    resultContent = resultContent.replace(/```json/g, '').replace(/```/g, '').trim();
+    
     const parsedResult = JSON.parse(resultContent);
 
     return NextResponse.json({
