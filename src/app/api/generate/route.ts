@@ -16,7 +16,16 @@ export async function POST(req: Request) {
 
     // 1. Transcribe Audio using Groq Whisper
     const groqFormData = new FormData();
-    groqFormData.append('file', audioFile, 'audio.webm');
+    
+    // Check mime type to assign correct extension (Crucial for iOS Support)
+    const mimeType = audioFile.type || '';
+    let ext = 'webm';
+    if (mimeType.includes('mp4') || mimeType.includes('m4a')) ext = 'm4a';
+    else if (mimeType.includes('ogg')) ext = 'ogg';
+    else if (mimeType.includes('wav')) ext = 'wav';
+    else if (mimeType.includes('mpeg') || mimeType.includes('mp3')) ext = 'mp3';
+
+    groqFormData.append('file', audioFile, `audio.${ext}`);
     groqFormData.append('model', 'whisper-large-v3-turbo');
     groqFormData.append('response_format', 'json');
 

@@ -2,9 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
 import { Mic } from 'lucide-react';
-import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
-import MobileNav from '@/components/MobileNav';
+import { ClerkProvider } from '@clerk/nextjs';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
   title: 'Voice to LinkedIn Post Generator: AI Carousel Maker | EchoPost',
@@ -12,64 +11,17 @@ export const metadata: Metadata = {
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = await auth();
-
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
         <body className="min-h-screen bg-[#020617] text-slate-50 flex flex-col font-sans selection:bg-cyan-500/30 overflow-x-hidden">
           
-          {/* Professional Global Header */}
-          <header className="sticky top-0 z-50 w-full border-b border-slate-800/60 bg-[#020617]/85 backdrop-blur-lg">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-20">
-                
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all">
-                    <Mic size={20} className="text-white" />
-                  </div>
-                  <span className="font-bold text-2xl tracking-tight">EchoPost</span>
-                </Link>
-
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                  <Link href="/guides" className="hover:text-cyan-400 transition-colors">SEO Guides</Link>
-                  <Link href="/about" className="hover:text-cyan-400 transition-colors">About Us</Link>
-                  <Link href="/contact" className="hover:text-cyan-400 transition-colors">Contact</Link>
-                  <Link href="/privacy" className="hover:text-cyan-400 transition-colors">Privacy</Link>
-                </nav>
-
-                {/* CTA Buttons */}
-                <div className="flex items-center gap-4 md:gap-5">
-                  {!userId ? (
-                    <>
-                      <SignInButton mode="modal">
-                        <button className="hidden md:block text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer">
-                          Sign in
-                        </button>
-                      </SignInButton>
-                      <SignInButton mode="modal">
-                        <button className="px-4 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-semibold bg-white text-slate-900 hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] cursor-pointer">
-                          Continue with Google
-                        </button>
-                      </SignInButton>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/dashboard" className="hidden md:block text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors mr-4">Dashboard</Link>
-                      <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 md:w-10 md:h-10 border-2 border-cyan-500/30" } }} />
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </header>
+          <Header />
 
         {/* Main Page Content */}
         <main className="flex-grow flex flex-col relative pb-20 md:pb-0">
@@ -118,7 +70,7 @@ export default async function RootLayout({
             </div>
             
             <div className="pt-8 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-              <p>© {new Date().getFullYear()} EchoPost Technologies Inc. All rights reserved.</p>
+              <p>Ac {new Date().getFullYear()} EchoPost Technologies Inc. All rights reserved.</p>
               <div className="flex gap-6">
                 <span className="hover:text-slate-300 cursor-pointer transition-colors">Twitter</span>
                 <span className="hover:text-slate-300 cursor-pointer transition-colors">LinkedIn</span>
@@ -127,8 +79,6 @@ export default async function RootLayout({
             </div>
           </div>
         </footer>
-
-        <MobileNav />
       </body>
     </html>
     </ClerkProvider>

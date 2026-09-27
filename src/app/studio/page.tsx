@@ -41,7 +41,8 @@ export default function StudioPage() {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const mimeType = mediaRecorder.mimeType || '';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         setStatus('processing');
         
         const formData = new FormData();
