@@ -41,12 +41,17 @@ export default function StudioPage() {
       };
 
       mediaRecorder.onstop = async () => {
-        const mimeType = mediaRecorder.mimeType || '';
+        // Stop all tracks safely AFTER the recorder has finalized the data
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         setStatus('processing');
         
+        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('m4a') ? 'm4a' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+        
         const formData = new FormData();
-        formData.append('audio', audioBlob);
+        formData.append('audio', audioBlob, `audio.${ext}`);
 
         try {
           const res = await fetch('/api/generate', { method: 'POST', body: formData });
@@ -61,7 +66,7 @@ export default function StudioPage() {
         }
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(1000); // Flush data every 1 second for Safari/Mobile reliability
       setRecordingTime(0);
       setStatus('recording');
     } catch (error) {
@@ -72,7 +77,6 @@ export default function StudioPage() {
   const stopRecording = () => {
     if (mediaRecorderRef.current && status === 'recording') {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     }
   };
 
