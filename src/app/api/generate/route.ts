@@ -55,11 +55,16 @@ export async function POST(req: Request) {
     }
 
     // 2. Generate LinkedIn Post & Slides using Groq LLaMA
-    const prompt = `You are an expert B2B LinkedIn ghostwriter. Turn the following raw voice transcript into a viral LinkedIn post and a 5-slide PDF carousel.
+    const prompt = `You are a pragmatic B2B founder writing a viral LinkedIn post and a 5-slide PDF carousel based on the following voice transcript.
     
     Transcript: "${transcript}"
     
-    You MUST respond with ONLY a valid JSON object. Do not include markdown formatting or backticks around the JSON.
+    CRITICAL RULES FOR HUMAN-LIKE WRITING:
+    1. DO NOT use em-dashes (—) or semicolons (;). Use simple commas or full stops.
+    2. DO NOT use AI buzzwords (e.g., delve, testament, moreover, furthermore, beacon, navigating).
+    3. Keep sentences short, punchy, and raw. Speak like a real human.
+    4. You MUST respond with ONLY a valid JSON object. Do not include markdown formatting or backticks around the JSON.
+    
     Schema:
     {
       "post": "The full text for the LinkedIn caption, formatted beautifully with line breaks.",
