@@ -174,6 +174,34 @@ export default function StudioPage() {
                   <Mic size={48} className="text-white group-hover:scale-110 transition-transform" />
                 </button>
                 <h3 className="mt-8 text-2xl font-bold text-slate-200">Tap to Start</h3>
+                
+                {/* Professional Guide Section */}
+                <div className="mt-12 w-full max-w-lg border-t border-slate-800/60 pt-10">
+                  <h4 className="text-slate-500 font-semibold mb-8 text-center text-xs uppercase tracking-widest">How to use EchoPost</h4>
+                  <div className="space-y-8">
+                    <div className="flex gap-5 items-start group">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 text-cyan-400 flex items-center justify-center shrink-0 font-bold border border-slate-700 group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10 transition-colors">1</div>
+                      <div>
+                        <h5 className="text-slate-200 font-bold mb-1.5 text-lg">Brain-dump your idea</h5>
+                        <p className="text-slate-400 text-sm leading-relaxed">Hit record and just speak naturally. Don't worry about grammar, pauses, or structure. Just dump your thoughts.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-5 items-start group">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 text-purple-400 flex items-center justify-center shrink-0 font-bold border border-slate-700 group-hover:border-purple-500/50 group-hover:bg-purple-500/10 transition-colors">2</div>
+                      <div>
+                        <h5 className="text-slate-200 font-bold mb-1.5 text-lg">AI does the heavy lifting</h5>
+                        <p className="text-slate-400 text-sm leading-relaxed">Groq instantly transcribes your audio and transforms it into a high-converting, broetry-style LinkedIn post.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-5 items-start group">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 text-emerald-400 flex items-center justify-center shrink-0 font-bold border border-slate-700 group-hover:border-emerald-500/50 group-hover:bg-emerald-500/10 transition-colors">3</div>
+                      <div>
+                        <h5 className="text-slate-200 font-bold mb-1.5 text-lg">Export & Publish</h5>
+                        <p className="text-slate-400 text-sm leading-relaxed">1-click copy the text for your timeline, or download the perfectly formatted HD Carousel PDF to attach.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             )}
 
