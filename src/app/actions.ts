@@ -9,7 +9,7 @@ const supabase = createClient(
 );
 
 export async function savePost(transcript: string, post: string, slides: any[]) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   
   const { data, error } = await supabase.from('posts').insert({
@@ -27,7 +27,7 @@ export async function savePost(transcript: string, post: string, slides: any[]) 
 }
 
 export async function getPosts() {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return [];
   
   const { data, error } = await supabase
@@ -44,7 +44,7 @@ export async function getPosts() {
 }
 
 export async function deletePosts(ids: string[]) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   
   const { error } = await supabase
