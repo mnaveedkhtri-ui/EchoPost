@@ -47,37 +47,45 @@ export default function StudioPage() {
     if (!result) return;
     setIsExporting(true);
     try {
-      // Create a temporary clean DOM element using only HEX colors (No Tailwind lab/oklch colors)
-      const tempContainer = document.createElement('div');
-      tempContainer.style.width = '1080px';
-      tempContainer.style.backgroundColor = '#0f172a';
-      tempContainer.style.position = 'fixed';
-      tempContainer.style.left = '-9999px'; // Hide off-screen
+      const { jsPDF } = await import('jspdf');
       
-      const slidesHtml = result.slides.map((slide: any, i: number) => `
-        <div style="width: 1080px; height: 1080px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #0f172a; color: #ffffff; padding: 80px; text-align: center; font-family: system-ui, -apple-system, sans-serif; position: relative;">
-          <div style="position: absolute; top: 60px; left: 60px; color: #64748b; font-size: 32px; font-weight: bold; font-family: monospace;">0${i+1}</div>
-          <h1 style="font-size: 72px; font-weight: 900; margin-bottom: 40px; line-height: 1.2; color: #ffffff;">${slide.title}</h1>
-          <p style="font-size: 40px; color: #cbd5e1; max-width: 900px; line-height: 1.5;">${slide.content}</p>
-        </div>
-      `).join('');
-
-      tempContainer.innerHTML = slidesHtml;
-      document.body.appendChild(tempContainer);
-
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default || html2pdfModule;
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [1080, 1080]
+      });
       
-      await html2pdf().set({
-        margin: 0,
-        filename: 'EchoPost-Carousel.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 1, useCORS: true, logging: false },
-        jsPDF: { unit: 'px', format: [1080, 1080], orientation: 'portrait' } 
-      }).from(tempContainer).save();
+      result.slides.forEach((slide: any, i: number) => {
+        if (i > 0) doc.addPage();
+        
+        // Background
+        doc.setFillColor("#0f172a");
+        doc.rect(0, 0, 1080, 1080, "F");
+        
+        // Slide Number
+        doc.setFontSize(36);
+        doc.setTextColor("#64748b");
+        doc.text(`0${i+1}`, 80, 100);
+        
+        // Title (Centered)
+        doc.setFontSize(72);
+        doc.setTextColor("#ffffff");
+        doc.setFont("helvetica", "bold");
+        const titleLines = doc.splitTextToSize(slide.title, 900);
+        // Start title roughly in the upper-middle
+        doc.text(titleLines, 540, 400, { align: "center", baseline: "middle" });
+        
+        // Content (Centered)
+        doc.setFontSize(40);
+        doc.setTextColor("#cbd5e1");
+        doc.setFont("helvetica", "normal");
+        const contentLines = doc.splitTextToSize(slide.content, 900);
+        // Place content below title
+        doc.text(contentLines, 540, 600, { align: "center", baseline: "middle" });
+      });
 
-      // Cleanup
-      document.body.removeChild(tempContainer);
+      doc.save("EchoPost-Carousel.pdf");
+      
     } catch (error: any) {
       console.error("PDF Export failed:", error);
       alert(`PDF Export failed: ${error?.message || 'Unknown error'}`);
