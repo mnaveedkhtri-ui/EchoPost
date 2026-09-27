@@ -44,6 +44,7 @@ export default function StudioPage() {
   };
 
   const handleExportPDF = async () => {
+    if (!result) return;
     setIsExporting(true);
     try {
       // Create a temporary clean DOM element using only HEX colors (No Tailwind lab/oklch colors)
