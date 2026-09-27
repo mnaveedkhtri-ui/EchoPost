@@ -42,8 +42,9 @@ const GUIDES_DB = {
   }
 };
 
-export default function GuideArticle({ params }: { params: { slug: string } }) {
-  const guide = GUIDES_DB[params.slug as keyof typeof GUIDES_DB];
+export default async function GuideArticle({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const guide = GUIDES_DB[resolvedParams.slug as keyof typeof GUIDES_DB];
 
   if (!guide) {
     notFound();
