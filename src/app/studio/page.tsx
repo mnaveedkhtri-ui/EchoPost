@@ -43,47 +43,40 @@ export default function StudioPage() {
     });
   };
 
-  const handleExportPDF = () => {
-    if (!result) return;
+  const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert("Please allow popups to export the PDF.");
-        setIsExporting(false);
-        return;
-      }
+      // Create a temporary clean DOM element using only HEX colors (No Tailwind lab/oklch colors)
+      const tempContainer = document.createElement('div');
+      tempContainer.style.width = '1080px';
+      tempContainer.style.backgroundColor = '#0f172a';
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.left = '-9999px'; // Hide off-screen
       
       const slidesHtml = result.slides.map((slide: any, i: number) => `
-        <div style="page-break-after: always; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #0f172a; color: white; padding: 60px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
-          <div style="position: absolute; top: 40px; left: 40px; color: #64748b; font-size: 24px; font-weight: bold; font-family: monospace;">0${i+1}</div>
-          <h1 style="font-size: 56px; font-weight: 900; margin-bottom: 40px; line-height: 1.2;">${slide.title}</h1>
-          <p style="font-size: 32px; color: #cbd5e1; max-width: 900px; line-height: 1.5;">${slide.content}</p>
+        <div style="width: 1080px; height: 1080px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #0f172a; color: #ffffff; padding: 80px; text-align: center; font-family: system-ui, -apple-system, sans-serif; position: relative;">
+          <div style="position: absolute; top: 60px; left: 60px; color: #64748b; font-size: 32px; font-weight: bold; font-family: monospace;">0${i+1}</div>
+          <h1 style="font-size: 72px; font-weight: 900; margin-bottom: 40px; line-height: 1.2; color: #ffffff;">${slide.title}</h1>
+          <p style="font-size: 40px; color: #cbd5e1; max-width: 900px; line-height: 1.5;">${slide.content}</p>
         </div>
       `).join('');
 
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>EchoPost Carousel</title>
-            <style>
-              @page { size: 10in 10in; margin: 0; }
-              body { margin: 0; background: #0f172a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            </style>
-          </head>
-          <body>
-            ${slidesHtml}
-            <script>
-              window.onload = () => {
-                setTimeout(() => {
-                  window.print();
-                }, 500);
-              };
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
+      tempContainer.innerHTML = slidesHtml;
+      document.body.appendChild(tempContainer);
+
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default || html2pdfModule;
+      
+      await html2pdf().set({
+        margin: 0,
+        filename: 'EchoPost-Carousel.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 1, useCORS: true, logging: false },
+        jsPDF: { unit: 'px', format: [1080, 1080], orientation: 'portrait' } 
+      }).from(tempContainer).save();
+
+      // Cleanup
+      document.body.removeChild(tempContainer);
     } catch (error: any) {
       console.error("PDF Export failed:", error);
       alert(`PDF Export failed: ${error?.message || 'Unknown error'}`);
