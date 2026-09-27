@@ -8,16 +8,22 @@ import { Trash2, CheckSquare } from 'lucide-react';
 export default function DashboardPage() {
   const { user } = useUser();
   const [history, setHistory] = useState<any[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('echopost_history');
-      if (saved) setHistory(JSON.parse(saved));
-    } catch(e) {}
+    async function loadData() {
+      try {
+        const { getPosts } = await import('../actions');
+        const posts = await getPosts();
+        setHistory(posts);
+      } catch(e) {
+        console.error("Failed to load posts from Supabase", e);
+      }
+    }
+    loadData();
   }, []);
   
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: string) => {
     const newSet = new Set(selectedIds);
     if (newSet.has(id)) newSet.delete(id);
     else newSet.add(id);
@@ -32,17 +38,22 @@ export default function DashboardPage() {
     }
   };
 
-  const deleteSelected = () => {
+  const deleteSelected = async () => {
     if (!confirm(`Are you sure you want to delete ${selectedIds.size} post(s)?`)) return;
     
+    // Optimistic UI update
+    const previousHistory = [...history];
     const newHistory = history.filter(item => !selectedIds.has(item.id));
     setHistory(newHistory);
-    setSelectedIds(new Set());
     
     try {
-      localStorage.setItem('echopost_history', JSON.stringify(newHistory));
+      const { deletePosts } = await import('../actions');
+      await deletePosts(Array.from(selectedIds));
+      setSelectedIds(new Set());
     } catch (e) {
-      console.error("Failed to update storage", e);
+      console.error("Failed to delete from Supabase", e);
+      setHistory(previousHistory); // Revert on failure
+      alert("Failed to delete posts from cloud.");
     }
   };
 
@@ -119,7 +130,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm text-cyan-500 mb-2 font-bold">{new Date(item.date).toLocaleString()}</div>
+                  <div className="text-sm text-cyan-500 mb-2 font-bold">{new Date(item.created_at).toLocaleString()}</div>
                   <div className="text-slate-200 text-sm whitespace-pre-wrap leading-relaxed">
                     {item.post.slice(0, 300)}{item.post.length > 300 ? '...' : ''}
                   </div>

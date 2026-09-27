@@ -124,12 +124,13 @@ export default function StudioPage() {
           setResult(data);
           setStatus('done');
 
-          // Save to LocalStorage for Dashboard
+          // Save to Supabase Cloud Database
           try {
-            const history = JSON.parse(localStorage.getItem('echopost_history') || '[]');
-            history.unshift({ id: Date.now(), ...data, date: new Date().toISOString() });
-            localStorage.setItem('echopost_history', JSON.stringify(history.slice(0, 20))); // Keep last 20
-          } catch(e) { console.error("Could not save to history"); }
+            const { savePost } = await import('../actions');
+            await savePost(data.transcript || 'No transcript', data.post, data.slides);
+          } catch(e) { 
+            console.error("Could not save to Supabase DB:", e); 
+          }
           
         } catch (err: any) {
           setErrorMessage(err.message);
