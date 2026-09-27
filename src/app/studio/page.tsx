@@ -32,15 +32,15 @@ export default function StudioPage() {
   const [isCopied, setIsCopied] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = () => {
     if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result.post);
+    // Direct synchronous call for better mobile support
+    navigator.clipboard.writeText(result.post).then(() => {
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      alert("Failed to copy text. Please select and copy manually.");
-    }
+    }).catch(err => {
+      alert("Failed to copy. Please select the text and copy manually.");
+    });
   };
 
   const handleExportPDF = async () => {
@@ -48,18 +48,21 @@ export default function StudioPage() {
     try {
       const element = document.getElementById('carousel-preview');
       if (!element) return;
-      // Using standard require to prevent async import crashes on some browsers
-      const html2pdf = (await import('html2pdf.js')).default;
+      
+      // Fix for CommonJS / ESM dynamic import mismatch
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default || html2pdfModule;
+      
       await html2pdf().set({
         margin: 0,
         filename: 'EchoPost-Carousel.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: [10, 10], orientation: 'portrait' } // Square format for LinkedIn slides
+        jsPDF: { unit: 'in', format: [10, 10], orientation: 'portrait' } 
       }).from(element).save();
-    } catch (error) {
+    } catch (error: any) {
       console.error("PDF Export failed:", error);
-      alert("PDF Export failed. Please try again.");
+      alert(`PDF Export failed: ${error?.message || 'Unknown error'}`);
     }
     setIsExporting(false);
   };
@@ -123,8 +126,8 @@ export default function StudioPage() {
   };
 
   const resetStudio = () => {
-    setResult(null);
-    setStatus('idle');
+    // Bulletproof reset for mobile Safari
+    window.location.reload();
   };
 
   return (
@@ -146,7 +149,7 @@ export default function StudioPage() {
             
             {status === 'idle' && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                <button onClick={startRecording} className="w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:scale-105 transition-all group cursor-pointer z-20 relative">
+                <button onClick={startRecording} className="w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:scale-105 transition-all group cursor-pointer z-50 relative pointer-events-auto">
                   <Mic size={48} className="text-white group-hover:scale-110 transition-transform" />
                 </button>
                 <h3 className="mt-8 text-2xl font-bold text-slate-200">Tap to Start</h3>
@@ -161,7 +164,7 @@ export default function StudioPage() {
                     <motion.div key={i} animate={{ height: ['20%', '100%', '30%', '80%', '20%'] }} transition={{ duration: 0.8 + Math.random() * 0.5, repeat: Infinity, delay: i * 0.05 }} className="w-2 bg-cyan-400 rounded-full" />
                   ))}
                 </div>
-                <button onClick={stopRecording} className="w-20 h-20 rounded-full bg-rose-500/10 border-2 border-rose-500 flex items-center justify-center hover:bg-rose-500/20 transition-all cursor-pointer z-20 relative">
+                <button onClick={stopRecording} className="w-20 h-20 rounded-full bg-rose-500/10 border-2 border-rose-500 flex items-center justify-center hover:bg-rose-500/20 transition-all cursor-pointer z-50 relative pointer-events-auto">
                   <Square size={28} className="text-rose-500" fill="currentColor" />
                 </button>
               </motion.div>
@@ -176,16 +179,17 @@ export default function StudioPage() {
             )}
 
             {status === 'error' && (
-              <motion.div key="error" className="flex flex-col items-center text-center z-20 relative">
+              <motion.div key="error" className="flex flex-col items-center text-center z-50 relative">
                 <div className="text-rose-500 text-6xl mb-4">⚠️</div>
                 <h3 className="text-2xl font-bold text-slate-200 mb-3">Error</h3>
                 <p className="text-slate-400 mb-6">{errorMessage}</p>
-                <button onClick={resetStudio} className="px-6 py-2 rounded-full bg-slate-800 text-white hover:bg-slate-700 cursor-pointer">Try Again</button>
+                <button onClick={resetStudio} className="px-6 py-2 rounded-full bg-slate-800 text-white hover:bg-slate-700 cursor-pointer pointer-events-auto">Try Again</button>
               </motion.div>
             )}
 
             {status === 'done' && result && (
-              <motion.div key="done" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 z-20 relative">
+              <motion.div key="done" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 z-50 relative pointer-events-auto">
+
                 
                 {/* Text Post Section */}
                 <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-8 shadow-xl">
