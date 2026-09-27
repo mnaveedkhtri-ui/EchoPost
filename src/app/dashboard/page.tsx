@@ -1,4 +1,4 @@
-import { UserButton, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 
 export default async function DashboardPage() {
   const user = await currentUser();
