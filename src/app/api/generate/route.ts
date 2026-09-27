@@ -18,15 +18,19 @@ export async function POST(req: Request) {
     const groqFormData = new FormData();
     
     // Check mime type to assign correct extension (Crucial for iOS Support)
-    const mimeType = audioFile.type || '';
+    const mimeType = audioFile.type || 'audio/webm';
     let ext = 'webm';
     if (mimeType.includes('mp4') || mimeType.includes('m4a')) ext = 'm4a';
     else if (mimeType.includes('ogg')) ext = 'ogg';
     else if (mimeType.includes('wav')) ext = 'wav';
     else if (mimeType.includes('mpeg') || mimeType.includes('mp3')) ext = 'mp3';
 
-    groqFormData.append('file', audioFile, `audio.${ext}`);
-    groqFormData.append('model', 'whisper-large-v3-turbo');
+    // Safely convert to a Buffer-backed File for robust backend proxying
+    const arrayBuffer = await audioFile.arrayBuffer();
+    const fileBlob = new Blob([arrayBuffer], { type: mimeType });
+    
+    groqFormData.append('file', fileBlob, `audio.${ext}`);
+    groqFormData.append('model', 'whisper-large-v3');
     groqFormData.append('response_format', 'json');
 
     const whisperRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
