@@ -44,6 +44,7 @@ export default function StudioPage() {
   };
 
   const handleExportPDF = () => {
+    if (!result) return;
     setIsExporting(true);
     try {
       const printWindow = window.open('', '_blank');
