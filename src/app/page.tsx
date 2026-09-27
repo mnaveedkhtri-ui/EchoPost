@@ -68,64 +68,19 @@ export default function Home() {
           className="relative flex flex-col items-center justify-center w-full max-w-lg p-10 glass-panel rounded-[2rem] border border-slate-700/50 shadow-2xl bg-slate-900/40 backdrop-blur-xl"
         >
           <div className="mb-10 text-center h-8">
-            {isRecording ? (
-              <span className="text-rose-400 font-medium animate-pulse flex items-center gap-2 justify-center text-lg">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" /> Recording your authentic thoughts...
-              </span>
-            ) : isProcessing ? (
-              <span className="text-cyan-400 font-medium flex items-center gap-3 justify-center text-lg">
-                <Wand2 className="animate-spin" size={20} /> Crafting your organic post...
-              </span>
-            ) : (
-              <span className="text-slate-300 font-medium text-lg">Tap the mic to start speaking</span>
-            )}
+             <span className="text-slate-300 font-medium text-lg">Tap the mic to enter the Creator Studio</span>
           </div>
 
           {/* The Mic Button */}
           <div className="relative">
-            {isRecording && (
-              <>
-                <motion.div
-                  animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0, 0.4] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 rounded-full bg-rose-500/30 blur-xl"
-                />
-                <motion.div
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                  className="absolute inset-0 rounded-full bg-rose-400/40 blur-md"
-                />
-              </>
-            )}
-            
-            <button
-              onClick={handleRecordClick}
-              disabled={isProcessing}
-              className={`relative z-10 w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${
-                isProcessing 
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                  : isRecording
-                  ? 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/40 hover:scale-105'
-                  : 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/40 hover:scale-105'
-              }`}
-            >
-              {isRecording ? <Square fill="currentColor" size={36} /> : <Mic size={36} />}
-            </button>
+            <Link href="/studio">
+              <button
+                className="relative z-10 w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/40 hover:scale-105 cursor-pointer"
+              >
+                <Mic size={36} />
+              </button>
+            </Link>
           </div>
-
-          {/* Audio Visualizer Mockup */}
-          {isRecording && (
-            <div className="flex items-center justify-center gap-1.5 mt-12 h-10 w-full px-8">
-              {[...Array(16)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  animate={{ height: ['20%', '100%', '40%', '90%', '20%'] }}
-                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.05, ease: "easeInOut" }}
-                  className="w-1.5 bg-rose-400 rounded-full"
-                />
-              ))}
-            </div>
-          )}
         </motion.div>
       </div>
 

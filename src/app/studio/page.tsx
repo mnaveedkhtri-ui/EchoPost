@@ -152,14 +152,28 @@ export default function StudioPage() {
                 <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-8 shadow-xl">
                    <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-slate-100">Carousel Preview</h3>
-                    <button className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors">
+                    <button 
+                      onClick={async () => {
+                        const element = document.getElementById('carousel-preview');
+                        if (!element) return;
+                        const html2pdf = (await import('html2pdf.js')).default;
+                        html2pdf().set({
+                          margin: 0.5,
+                          filename: 'EchoPost-Carousel.pdf',
+                          image: { type: 'jpeg', quality: 0.98 },
+                          html2canvas: { scale: 2, useCORS: true },
+                          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                        }).from(element).save();
+                      }}
+                      className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer"
+                    >
                       <FileDown size={16} /> Export PDF
                     </button>
                   </div>
                   
-                  <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div id="carousel-preview" className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar pb-8">
                     {result.slides.map((slide, i) => (
-                      <div key={i} className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-8 flex flex-col justify-center items-center text-center shadow-lg relative">
+                      <div key={i} className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-8 flex flex-col justify-center items-center text-center shadow-lg relative shrink-0">
                         <span className="absolute top-4 left-4 text-slate-500 font-mono text-sm">0{i+1}</span>
                         <h4 className="text-2xl font-black text-white mb-4 leading-tight">{slide.title}</h4>
                         <p className="text-slate-300">{slide.content}</p>
