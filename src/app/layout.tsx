@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { Mic } from 'lucide-react';
 import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
+import MobileNav from '@/components/MobileNav';
 
 export const metadata: Metadata = {
   title: 'Voice to LinkedIn Post Generator: AI Carousel Maker | EchoPost',
   description: 'Turn raw voice notes into viral LinkedIn carousels and B2B posts instantly. The ultimate AI personal branding engine for busy founders and agencies.',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
 export default async function RootLayout({
@@ -20,7 +22,7 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
-        <body className="min-h-screen bg-[#020617] text-slate-50 flex flex-col font-sans selection:bg-cyan-500/30">
+        <body className="min-h-screen bg-[#020617] text-slate-50 flex flex-col font-sans selection:bg-cyan-500/30 overflow-x-hidden">
           
           {/* Professional Global Header */}
           <header className="sticky top-0 z-50 w-full border-b border-slate-800/60 bg-[#020617]/85 backdrop-blur-lg">
@@ -44,7 +46,7 @@ export default async function RootLayout({
                 </nav>
 
                 {/* CTA Buttons */}
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-4 md:gap-5">
                   {!userId ? (
                     <>
                       <SignInButton mode="modal">
@@ -53,15 +55,15 @@ export default async function RootLayout({
                         </button>
                       </SignInButton>
                       <SignInButton mode="modal">
-                        <button className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-slate-900 hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] cursor-pointer">
+                        <button className="px-4 md:px-5 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-semibold bg-white text-slate-900 hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] cursor-pointer">
                           Continue with Google
                         </button>
                       </SignInButton>
                     </>
                   ) : (
                     <>
-                      <Link href="/dashboard" className="text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors mr-4">Dashboard</Link>
-                      <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border-2 border-cyan-500/30" } }} />
+                      <Link href="/dashboard" className="hidden md:block text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors mr-4">Dashboard</Link>
+                      <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 md:w-10 md:h-10 border-2 border-cyan-500/30" } }} />
                     </>
                   )}
                 </div>
@@ -70,7 +72,7 @@ export default async function RootLayout({
           </header>
 
         {/* Main Page Content */}
-        <main className="flex-grow flex flex-col relative">
+        <main className="flex-grow flex flex-col relative pb-20 md:pb-0">
           {children}
         </main>
 
@@ -126,6 +128,7 @@ export default async function RootLayout({
           </div>
         </footer>
 
+        <MobileNav />
       </body>
     </html>
     </ClerkProvider>
