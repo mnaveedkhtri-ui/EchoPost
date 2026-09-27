@@ -43,23 +43,46 @@ export default function StudioPage() {
     });
   };
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = () => {
     setIsExporting(true);
     try {
-      const element = document.getElementById('carousel-preview');
-      if (!element) return;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert("Please allow popups to export the PDF.");
+        setIsExporting(false);
+        return;
+      }
       
-      // Fix for CommonJS / ESM dynamic import mismatch
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default || html2pdfModule;
-      
-      await html2pdf().set({
-        margin: 0,
-        filename: 'EchoPost-Carousel.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: [10, 10], orientation: 'portrait' } 
-      }).from(element).save();
+      const slidesHtml = result.slides.map((slide: any, i: number) => `
+        <div style="page-break-after: always; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #0f172a; color: white; padding: 60px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
+          <div style="position: absolute; top: 40px; left: 40px; color: #64748b; font-size: 24px; font-weight: bold; font-family: monospace;">0${i+1}</div>
+          <h1 style="font-size: 56px; font-weight: 900; margin-bottom: 40px; line-height: 1.2;">${slide.title}</h1>
+          <p style="font-size: 32px; color: #cbd5e1; max-width: 900px; line-height: 1.5;">${slide.content}</p>
+        </div>
+      `).join('');
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>EchoPost Carousel</title>
+            <style>
+              @page { size: 10in 10in; margin: 0; }
+              body { margin: 0; background: #0f172a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            </style>
+          </head>
+          <body>
+            ${slidesHtml}
+            <script>
+              window.onload = () => {
+                setTimeout(() => {
+                  window.print();
+                }, 500);
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
     } catch (error: any) {
       console.error("PDF Export failed:", error);
       alert(`PDF Export failed: ${error?.message || 'Unknown error'}`);
@@ -125,11 +148,6 @@ export default function StudioPage() {
     }
   };
 
-  const resetStudio = () => {
-    // Bulletproof reset for mobile Safari
-    window.location.reload();
-  };
-
   return (
     <div className="min-h-screen pt-20 px-4 w-full flex flex-col items-center pb-24">
       <div className="fixed top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-cyan-900/10 blur-[120px] pointer-events-none" />
@@ -183,7 +201,7 @@ export default function StudioPage() {
                 <div className="text-rose-500 text-6xl mb-4">⚠️</div>
                 <h3 className="text-2xl font-bold text-slate-200 mb-3">Error</h3>
                 <p className="text-slate-400 mb-6">{errorMessage}</p>
-                <button onClick={resetStudio} className="px-6 py-2 rounded-full bg-slate-800 text-white hover:bg-slate-700 cursor-pointer pointer-events-auto">Try Again</button>
+                <a href="/studio" className="px-6 py-2 rounded-full bg-slate-800 text-white hover:bg-slate-700 cursor-pointer pointer-events-auto inline-block">Try Again</a>
               </motion.div>
             )}
 
@@ -238,9 +256,9 @@ export default function StudioPage() {
                 </div>
 
                 <div className="col-span-full flex justify-center mt-8">
-                  <button onClick={resetStudio} className="px-8 py-3 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors font-medium cursor-pointer relative z-30">
+                  <a href="/studio" className="px-8 py-3 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors font-medium cursor-pointer relative z-[100] inline-block">
                     Create Another Post
-                  </button>
+                  </a>
                 </div>
               </motion.div>
             )}
