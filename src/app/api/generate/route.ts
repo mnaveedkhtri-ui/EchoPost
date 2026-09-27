@@ -79,7 +79,7 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama3-70b-8192',
         messages: [
           { role: 'system', content: 'You are a helpful assistant that outputs ONLY pure JSON.' },
           { role: 'user', content: prompt }
