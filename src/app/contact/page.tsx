@@ -48,7 +48,7 @@ export default function ContactPage() {
 
         {/* Contact Form */}
         <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-3xl glass-panel shadow-2xl shadow-cyan-900/10">
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Work Email</label>
               <input type="email" required className="w-full bg-[#020617] border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors" placeholder="you@company.com" />
@@ -57,7 +57,7 @@ export default function ContactPage() {
               <label className="block text-sm font-medium text-slate-300 mb-2">Message</label>
               <textarea rows={5} required className="w-full bg-[#020617] border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors" placeholder="How can we help you grow?"></textarea>
             </div>
-            <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 rounded-lg transition-colors shadow-lg shadow-cyan-500/20">
+            <button type="button" className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 rounded-lg transition-colors shadow-lg shadow-cyan-500/20">
               Send Message
             </button>
             <p className="text-xs text-slate-500 text-center mt-4">
