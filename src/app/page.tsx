@@ -74,12 +74,11 @@ export default function Home() {
 
           {/* The Mic Button */}
           <div className="relative">
-            <Link href="/studio">
-              <button
-                className="relative z-10 w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/40 hover:scale-105 cursor-pointer"
-              >
-                <Mic size={36} />
-              </button>
+            <Link 
+              href="/studio"
+              className="relative z-10 w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/40 hover:scale-105 cursor-pointer border-4 border-[#020617]"
+            >
+              <Mic size={36} />
             </Link>
           </div>
         </motion.div>
