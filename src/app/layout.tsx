@@ -2,18 +2,21 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
 import { Mic } from 'lucide-react';
-import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 
 export const metadata: Metadata = {
   title: 'Voice to LinkedIn Post Generator: AI Carousel Maker | EchoPost',
   description: 'Turn raw voice notes into viral LinkedIn carousels and B2B posts instantly. The ultimate AI personal branding engine for busy founders and agencies.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { userId } = await auth();
+
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
@@ -42,22 +45,25 @@ export default function RootLayout({
 
                 {/* CTA Buttons */}
                 <div className="flex items-center gap-5">
-                  <SignedOut>
-                    <SignInButton mode="modal">
-                      <button className="hidden md:block text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer">
-                        Sign in
-                      </button>
-                    </SignInButton>
-                    <SignInButton mode="modal">
-                      <button className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-slate-900 hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] cursor-pointer">
-                        Continue with Google
-                      </button>
-                    </SignInButton>
-                  </SignedOut>
-                  <SignedIn>
-                    <Link href="/dashboard" className="text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors mr-4">Dashboard</Link>
-                    <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border-2 border-cyan-500/30" } }} />
-                  </SignedIn>
+                  {!userId ? (
+                    <>
+                      <SignInButton mode="modal">
+                        <button className="hidden md:block text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer">
+                          Sign in
+                        </button>
+                      </SignInButton>
+                      <SignInButton mode="modal">
+                        <button className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-slate-900 hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] cursor-pointer">
+                          Continue with Google
+                        </button>
+                      </SignInButton>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/dashboard" className="text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors mr-4">Dashboard</Link>
+                      <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border-2 border-cyan-500/30" } }} />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
